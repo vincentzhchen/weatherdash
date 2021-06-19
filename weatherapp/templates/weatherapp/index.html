@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WeatherDash</title>
+    {% load static %}
+    <link rel="stylesheet" href={% static "weatherapp/bulma.css" %}>
+    <meta http-equiv="refresh" content="1800">
+
+    <style>
+        @font-face {
+            font-family: "OpenSans";
+            src: local("OpenSans"),
+            url("{% static 'fonts/OpenSans-Light.ttf' %} format('truetype')");
+        }
+    </style>
+
+</head>
+
+<div class="center-screen">
+    <i class="wi wi-night-sleet"></i>
+
+    <body>
+        <section class="content is-large">
+            <div class="container">
+                <h1 id="clock" , class="title" , style="color: #eceff4">00:00</h1>
+                <script>
+                    setInterval(showTime, 1000);
+                    function showTime() {
+                        let time = new Date(new Date().toLocaleString("en-US", { timeZone: "US/Eastern" }));
+                        let hour = String(time.getHours()).padStart(2, "0");
+                        let min = String(time.getMinutes()).padStart(2, "0");
+                        let currentTime = hour + ":" + min
+                        document.getElementById("clock").innerHTML = currentTime;
+                    }
+                    showTime();
+                </script>
+                <h6 class="subtitle" , style="color: #eceff4">{{ time.date }}</h6>
+
+                <article class="media">
+                    <img src="{% static 'weatherapp/weather_icons/'|add:weather.icon|add:'.svg' %}" , width="200rem">
+                    <div class="media-content">
+                        <div class="content">
+                            <p style="float: middle;">
+                                <span class="content" , style="color: #88c0d0">
+                                    {{ weather.temperature }}°
+                                </span>
+                                <!-- <span class="content" , style="color: #ebcb8b; font-size: 2rem; vertical-align: middle">
+                                    {{ weather.hi }}°
+                                </span>
+                                <span class="content" , style="color: #eceff4; font-size: 2rem; vertical-align: middle">
+                                    | {{ weather.lo }}°
+                                </span> -->
+                            </p>
+                        </div>
+                    </div>
+                </article>
+                <!--
+                <div style="vertical-align: middle;">
+                    <p style="float: middle;">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:weather.icon|add:'.svg' %}" width="200rem">
+                    </p>
+                    <p style="float: right; font-size: 5rem; vertical-align: middle;">{{ weather.temperature }}°</p>
+                </div> -->
+
+            </div>
+        </section>
+
+        <section class="content">
+            <table class="table is-borderless" , style="table-layout: fixed">
+                <!-- <table class="table is-borderless"> -->
+                <tr>
+                    <td>
+                        <span class="subtitle is-2" , style="color: #eceff4">{{ forecast.day0.day }}</span>
+                        <br>
+                        <span class="subtitle is-1" , style="color: #ebcb8b">{{ forecast.day0.hi }}°</span>
+                        <span class="subtitle is-1" , style="color: #eceff4"> | {{ forecast.day0.lo }}°</span>
+                    </td>
+
+                    <td>
+                        <span class="subtitle is-2" , style="color: #eceff4">{{ forecast.day1.day }}</span>
+                        <br>
+                        <span class="subtitle is-1" , style="color: #ebcb8b">{{ forecast.day1.hi }}°</span>
+                        <span class="subtitle is-1" , style="color: #eceff4"> | {{ forecast.day1.lo }}°</span>
+                    </td>
+                    <td>
+                        <span class="subtitle is-2" , style="color: #eceff4">{{ forecast.day2.day }}</span>
+                        <br>
+                        <span class="subtitle is-1" , style="color: #ebcb8b">{{ forecast.day2.hi }}°</span>
+                        <span class="subtitle is-1" , style="color: #eceff4"> | {{ forecast.day2.lo }}°</span>
+                    </td>
+                    <td>
+                        <span class="subtitle is-2" , style="color: #eceff4">{{ forecast.day3.day }}</span>
+                        <br>
+                        <span class="subtitle is-1" , style="color: #ebcb8b">{{ forecast.day3.hi }}°</span>
+                        <span class="subtitle is-1" , style="color: #eceff4"> | {{ forecast.day3.lo }}°</span>
+                    </td>
+                    <td>
+                        <span class="subtitle is-2" , style="color: #eceff4">{{ forecast.day4.day }}</span>
+                        <br>
+                        <span class="subtitle is-1" , style="color: #ebcb8b">{{ forecast.day4.hi }}°</span>
+                        <span class="subtitle is-1" , style="color: #eceff4"> | {{ forecast.day4.lo }}°</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="align-content: center;">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day0.morning_icon|add:'.svg' %}" ,
+                            width="90rem" , src="Error.src" onerror="this.style.display='none'" />
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day0.noon_icon|add:'.svg' %}" ,
+                            width="90rem" , src="Error.src" onerror="this.style.display='none'" />
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day0.evening_icon|add:'.svg' %}" ,
+                            width="90rem" , src="Error.src" onerror="this.style.display='none'" />
+                    </td>
+
+                    <td style="align-content: center;">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day1.morning_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day1.noon_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day1.evening_icon|add:'.svg' %}" ,
+                            width="90rem">
+                    </td>
+
+                    <td style="align-content: center;">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day2.morning_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day2.noon_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day2.evening_icon|add:'.svg' %}" ,
+                            width="90rem">
+                    </td>
+
+                    <td style="align-content: center;">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day3.morning_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day3.noon_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day3.evening_icon|add:'.svg' %}" ,
+                            width="90rem">
+                    </td>
+
+                    <td style="align-content: center;">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day4.morning_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day4.noon_icon|add:'.svg' %}" ,
+                            width="90rem">
+                        <img src="{% static 'weatherapp/weather_icons/'|add:forecast.day4.evening_icon|add:'.svg' %}" ,
+                            width="90rem">
+                    </td>
+
+            </table>
+        </section>
+
+    </body>
+</div>
+
+</html>
