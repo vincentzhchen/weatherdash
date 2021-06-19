@@ -15,19 +15,19 @@ def _get_clock_and_date(tz_offset=None):
     return time
 
 
-def _get_weather_response(city_name="Jersey City",
-                          state_code="NJ",
-                          country_code="US",
-                          unit="metric"):
+def _get_weather_response(city_name=settings.CITY,
+                          state_code=settings.STATE_CODE,
+                          country_code=settings.COUNTRY_CODE,
+                          unit=settings.UNIT):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name},{state_code},{country_code}&units={unit}&appid={settings.OPEN_WEATHER_MAP_API_KEY}"
     weather_response = requests.get(url).json()
     return weather_response
 
 
-def _get_forecast_response(city_name="Jersey City",
-                           state_code="NJ",
-                           country_code="US",
-                           unit="metric"):
+def _get_forecast_response(city_name=settings.CITY,
+                           state_code=settings.STATE_CODE,
+                           country_code=settings.COUNTRY_CODE,
+                           unit=settings.UNIT):
     forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?q={city_name},{state_code},{country_code}&units={unit}&appid={settings.OPEN_WEATHER_MAP_API_KEY}"
     forecast_response = requests.get(forecast_url).json()
     all_forecasts = []
