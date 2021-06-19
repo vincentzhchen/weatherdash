@@ -11818,6 +11818,15 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
 
 
 /* CUSTOM */
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+}
+
 @font-face {
   font-family: "OpenSans";
   src: url("../static/fonts/OpenSans-Light.ttf") format("truetype");
