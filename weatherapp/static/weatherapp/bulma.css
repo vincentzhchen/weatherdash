@@ -11839,6 +11839,7 @@ html *
   /* font-style: normal !important; */
   background-color: #2E3440 !important;
   overflow: hidden;  /* Hide scrollbars */
+  user-select: none !important;
 }
 
 .clock {
