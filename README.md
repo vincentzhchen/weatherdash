@@ -15,7 +15,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 CITY = ""                      # e.g. "New York City"
 STATE_CODE = ""                # e.g. "NY"
 COUNTRY_CODE = ""              # e.g. "US"
-UNIT = ""                      # e.g. "C"
+UNIT = ""                      # e.g. "metric" or "imperial"
 OPEN_WEATHER_MAP_API_KEY = ""  # get this from https://openweathermap.org/
 
 ```
