@@ -1,9 +1,15 @@
+from pprint import pformat
+import traceback
+
 from django.shortcuts import render
 import pandas as pd
 import requests
 from requests.adapters import HTTPAdapter
 
+from weatherapp import utils
 from weatherdash import settings
+
+LOGGER = utils.get_logger()
 
 DEFAULT_WEATHER = {
     "city": "No data",
@@ -151,6 +157,8 @@ def _process_forecast_response(forecast_response):
 
 # Create your views here.
 def index(request):
+    LOGGER.info("Refreshing weatherdash data.")
+
     city_name = settings.CITY
     state_code = settings.STATE_CODE
     unit = settings.UNIT
@@ -207,7 +215,6 @@ def index(request):
                 df = pd.concat([df_today, df], ignore_index=True)
 
             weather_forecast = {}
-
             for index, row in df.iterrows():
                 weather_forecast["day" + str(index)] = {
                     "day": row["DAY"],
@@ -225,7 +232,8 @@ def index(request):
         else:
             weather_forecast = DEFAULT_FORECAST
 
-    except Exception as e:
+    except Exception:
+        LOGGER.info("Exception found:\n%s", traceback.format_exc())
         current_time = _get_clock_and_date()
         weather = DEFAULT_WEATHER
         weather_forecast = DEFAULT_FORECAST
@@ -236,5 +244,7 @@ def index(request):
             "time": current_time,
             "forecast": weather_forecast,
         }
+
+    LOGGER.info("Context:\n %s", pformat(context))
 
     return render(request, "weatherapp/index.html", context)
