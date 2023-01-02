@@ -1,5 +1,3 @@
-import time
-
 from django.shortcuts import render
 import pandas as pd
 import requests
@@ -31,6 +29,7 @@ _FORECAST_ONE_DAY = {
     "noon_icon": "01d",
     "evening_icon": "01d",
 }
+
 DEFAULT_FORECAST = {f"day{x}": _FORECAST_ONE_DAY for x in range(5)}
 
 
@@ -152,78 +151,90 @@ def _process_forecast_response(forecast_response):
 
 # Create your views here.
 def index(request):
-    city_name = "Jersey City"
-    state_code = "NJ"
-    unit = "metric"
+    city_name = settings.CITY
+    state_code = settings.STATE_CODE
+    unit = settings.UNIT
 
     # do not allow failure
-    weather_response = _get_weather_response(
-        city_name=city_name, state_code=state_code, unit=unit
-    )
+    try:
+        weather_response = _get_weather_response(
+            city_name=city_name, state_code=state_code, unit=unit
+        )
 
-    if int(weather_response["cod"]) == 200:
-        weather = {
-            "city": city_name,
-            "temperature": int(weather_response["main"]["temp"]),
-            "hi": int(weather_response["main"]["temp_max"]),
-            "lo": int(weather_response["main"]["temp_min"]),
-            "unit": "C" if unit == "metric" else "F",
-            "description": weather_response["weather"][0]["description"],
-            "icon": weather_response["weather"][0]["icon"],
-            "timezone_offset": weather_response["timezone"],
-        }
-    else:
-        weather = DEFAULT_WEATHER
-
-    current_time = _get_clock_and_date(tz_offset=weather["timezone_offset"])
-
-    # do not allow failure
-    forecast_response = _get_forecast_response(
-        city_name=city_name, state_code=state_code, unit=unit
-    )
-
-    if int(forecast_response["cod"]) == 200:
-        df = _process_forecast_response(forecast_response)
-        # IF TODAY IS MISSING when the data rolls, just append current weather
-        # to the front of the forecast df.
-        today = current_time["current_dt"].strftime("%a").upper()
-        if df["DAY"].tolist()[0] != today:
-            df_today = pd.DataFrame(
-                columns=df.columns,
-                data=[
-                    [
-                        current_time["current_dt"],
-                        today,
-                        weather["hi"],
-                        weather["lo"],
-                        "NONE",
-                        "NONE",
-                        "NONE",
-                        None,
-                        None,
-                        weather["icon"],
-                    ]
-                ],
-            )
-            df = pd.concat([df_today, df], ignore_index=True)
-
-        weather_forecast = {}
-        for index, row in df.iterrows():
-            weather_forecast["day" + str(index)] = {
-                "day": row["DAY"],
+        if int(weather_response["cod"]) == 200:
+            weather = {
                 "city": city_name,
-                "hi": row["HI"],
-                "lo": row["LO"],
+                "temperature": int(weather_response["main"]["temp"]),
+                "hi": int(weather_response["main"]["temp_max"]),
+                "lo": int(weather_response["main"]["temp_min"]),
                 "unit": "C" if unit == "metric" else "F",
-                "morning_description": row["MORNING_CONDITION"],
-                "noon_description": row["NOON_CONDITION"],
-                "evening_description": row["EVENING_CONDITION"],
-                "morning_icon": row["MORNING_ICON"],
-                "noon_icon": row["NOON_ICON"],
-                "evening_icon": row["EVENING_ICON"],
+                "description": weather_response["weather"][0]["description"],
+                "icon": weather_response["weather"][0]["icon"],
+                "timezone_offset": weather_response["timezone"],
             }
-    else:
+        else:
+            weather = DEFAULT_WEATHER
+
+        current_time = _get_clock_and_date(tz_offset=weather["timezone_offset"])
+
+        forecast_response = _get_forecast_response(
+            city_name=city_name, state_code=state_code, unit=unit
+        )
+
+        if int(forecast_response["cod"]) == 200:
+            df = _process_forecast_response(forecast_response)
+            # IF TODAY IS MISSING when the data rolls, just append current weather
+            # to the front of the forecast df.
+            today = current_time["current_dt"].strftime("%a").upper()
+            if df["DAY"].tolist()[0] != today:
+                df_today = pd.DataFrame(
+                    columns=df.columns,
+                    data=[
+                        [
+                            current_time["current_dt"],
+                            today,
+                            weather["hi"],
+                            weather["lo"],
+                            "NONE",
+                            "NONE",
+                            "NONE",
+                            None,
+                            None,
+                            weather["icon"],
+                        ]
+                    ],
+                )
+                df = pd.concat([df_today, df], ignore_index=True)
+
+            weather_forecast = {}
+
+            for index, row in df.iterrows():
+                weather_forecast["day" + str(index)] = {
+                    "day": row["DAY"],
+                    "city": city_name,
+                    "hi": row["HI"],
+                    "lo": row["LO"],
+                    "unit": "C" if unit == "metric" else "F",
+                    "morning_description": row["MORNING_CONDITION"],
+                    "noon_description": row["NOON_CONDITION"],
+                    "evening_description": row["EVENING_CONDITION"],
+                    "morning_icon": row["MORNING_ICON"],
+                    "noon_icon": row["NOON_ICON"],
+                    "evening_icon": row["EVENING_ICON"],
+                }
+        else:
+            weather_forecast = DEFAULT_FORECAST
+
+    except Exception as e:
+        current_time = _get_clock_and_date()
+        weather = DEFAULT_WEATHER
         weather_forecast = DEFAULT_FORECAST
 
-    context = {"weather": weather, "time": current_time, "forecast": weather_forecast}
+    finally:
+        context = {
+            "weather": weather,
+            "time": current_time,
+            "forecast": weather_forecast,
+        }
+
     return render(request, "weatherapp/index.html", context)
