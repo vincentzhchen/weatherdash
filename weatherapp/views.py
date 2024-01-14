@@ -4,7 +4,7 @@ import traceback
 from django.shortcuts import render
 import pandas as pd
 import requests
-from requests.adapters import HTTPAdapter
+from requests.adapters import HTTPAdapter, Retry
 
 from weatherapp import utils
 from weatherdash import settings
@@ -57,7 +57,8 @@ def _get_weather_response(
 ):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name},{state_code},{country_code}&units={unit}&appid={settings.OPEN_WEATHER_MAP_API_KEY}"
     session = requests.Session()
-    session.mount("http://", HTTPAdapter(max_retries=9))
+    retry = Retry(total=20, backoff_factor=1)
+    session.mount("http://", HTTPAdapter(max_retries=retry))
     weather_response = session.get(url).json()
     return weather_response
 
@@ -70,7 +71,8 @@ def _get_forecast_response(
 ):
     forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?q={city_name},{state_code},{country_code}&units={unit}&appid={settings.OPEN_WEATHER_MAP_API_KEY}"
     session = requests.Session()
-    session.mount("http://", HTTPAdapter(max_retries=9))
+    retry = Retry(total=20, backoff_factor=1)
+    session.mount("http://", HTTPAdapter(max_retries=retry))
     forecast_response = session.get(forecast_url).json()
     return forecast_response
 
